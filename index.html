@@ -30,7 +30,7 @@
     html.push('<input type="checkbox" id="cb_size" onchange="toggleSize()" checked="true">Original size');
     html.push('&nbsp;<span id="dbg_DIM">32x32</span>');
     html.push('<button onclick="BWGFX.save()" title="Save">Save</button>');
-    html.push('<br/><input type="range" id="range_width" value="32" min="4" max="320" step="1" oninput="BWGFX.render(this.value)" title="Width in pixel" style="width:100%;"/>');
+    html.push('<br/><input type="range" id="range_width" value="32" min="16" max="96" step="16" oninput="BWGFX.render(this.value)" title="Width in pixel" style="width:50%;"/>');
     html.push('<div id="info"><br/></div>');
     html.push('<canvas id="GFXcanvas" width="32" height="32"></canvas>');
     document.body.innerHTML = html.join('');

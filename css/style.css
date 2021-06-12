@@ -27,7 +27,7 @@ button {
   color: var(--bgCol);
   cursor: pointer;
 }
-button:focus{
+button:focus {
   outline: 0;
 }
 
@@ -38,10 +38,14 @@ button:focus{
   top: 5vh;
   background-color: black;
   image-rendering: pixelated;
+  -moz-image-rendering: pixelated;
 }
 #GFXcanvas.scale {
   height: 75vw;
   width: 75vw;
+}
+#GFXcanvas:hover {
+  transform: scale(2, 2);
 }
   @media (min-width:calc(4/3*90vh)) {
     #GFXcanvas.scale {
