@@ -1,0 +1,64 @@
+:root {
+  --bgCol: #05A;
+  --mainCol: #FFF;
+  --darkCol: #002;
+  --actCol: #F80;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bgCol);
+  color: var(--mainCol);
+  overflow: hidden;
+}
+select {
+  color: var(--bgCol);
+  cursor: pointer;
+}
+option {
+  color: var(--bgCol);
+}
+optgroup {
+  color: var(--actCol);
+}
+button {
+  border: 1px solid var(--actCol);
+  background-color: var(--mainCol);
+  color: var(--bgCol);
+  cursor: pointer;
+}
+button:focus{
+  outline: 0;
+}
+
+#GFXcanvas {
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 5vh;
+  background-color: black;
+  image-rendering: pixelated;
+}
+#GFXcanvas.scale {
+  height: 75vw;
+  width: 75vw;
+}
+  @media (min-width:calc(4/3*90vh)) {
+    #GFXcanvas.scale {
+      height: 90vh;
+      width: calc(4/3*90vh);
+    }
+  }
+#info {
+  position: absolute;
+  top: 5vh;
+  right: 0;
+  text-align: right;
+  z-index: 1;
+  height: 100vh;
+  overflow: scroll;
+}
+
+.aa {
+  image-rendering: auto !important;
+}

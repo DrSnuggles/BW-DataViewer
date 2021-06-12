@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Bloodwych Data Viewer by DrSnuggles</title>
+  <link href="css/style.css" type="text/css" rel="stylesheet"/>
+  <script src="https://drsnuggles.github.io/IFF/js/iff.js"></script>
+    <script src="https://drsnuggles.github.io/IFF/js/8svx.js"></script>
+
+  <script src="./js/bwgfx.js"></script>
+</head>
+<body>
+
+  <script>
+    // prepare body
+    var gfx = ['Airbourne Fireball','Airbourne Spells','Avatars Large','Bed','Behemoth','Beholder','Body Parts','Button Highlights','Crab','Crab Claw','Dragon','Dragon Claw','Entropy','Fairy','Floor Ceiling','Font','Head Parts','Large Doorway','MainWalls','Objects On Floor','Pad','Pillar','Pit','Pockets','Pointers','Portcullis','Scroll_Edge_Bottom','Scroll_Edge_Left','Scroll_Edge_Right','Scroll_Edge_Top','Shelf','Shield Bottom','Shield Classes','Shield Top','Shield_Avatars','Shield_Clicked','Sign','Sign Overlay','Slots','Stairs Down','Stairs Up','Summon','Switches','WoodDoors','WoodWall'];
+    var html = ['<select id="dataselect" onchange="Load(this.value)">','<optgroup label="GFX">'];
+    for (var i = 0, n = gfx.length; i < n; i++) {
+      html.push('<option value="data/bw-gfx/',gfx[i],'">',gfx[i],'</option>');
+    }
+    html.push('</optgroup>');
+    html.push('<optgroup label="SFX">');
+    for (var i = 1; i < 6; i++) {
+      html.push('<option value="data/bw-sfx/sample',i,'.sound">sample',i,'</option>');
+    }
+    html.push('</optgroup>');
+    html.push('</select>');
+    html.push('<button onclick="Load(dataselect.value)">Load</button>');
+    html.push('AntiAlias<input type="checkbox" id="cb_alias" onchange="toggleAlias()">');
+    html.push('<input type="checkbox" id="cb_size" onchange="toggleSize()" checked="true">Original size');
+    html.push('&nbsp;<span id="dbg_DIM">32x32</span>');
+    html.push('<button onclick="BWGFX.save()" title="Save">Save</button>');
+    html.push('<br/><input type="range" id="range_width" value="32" min="4" max="320" step="1" oninput="BWGFX.render(this.value)" title="Width in pixel" style="width:100%;"/>');
+    html.push('<div id="info"><br/></div>');
+    html.push('<canvas id="GFXcanvas" width="32" height="32"></canvas>');
+    document.body.innerHTML = html.join('');
+    dataselect.selectedIndex = 4; // Behemoth
+    Load(dataselect.value);
+    
+    //
+    // how to use
+    //
+    function Load(url) {
+      info.innerHTML = "";
+      if (url.indexOf("/bw-sfx/") > 0 ) {
+        // old IFF/8SVX playback
+        IFF.load(url);
+      } else {
+        // new Atari ST Bloodwych gfx viewer
+        BWGFX.load(url, GFXcanvas);
+      }
+    }
+    function toggleAlias() {
+      if (cb_alias.checked) {
+        GFXcanvas.classList.add("aa");
+      } else {
+        GFXcanvas.classList.remove("aa");
+      }
+    }
+    function toggleSize() {
+      if (cb_size.checked) {
+        GFXcanvas.classList.remove("scale");
+      } else {
+        GFXcanvas.classList.add("scale");
+      }
+    }
+  </script>
+
+</body>
+</html>
