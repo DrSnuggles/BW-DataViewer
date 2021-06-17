@@ -4,30 +4,67 @@
 
 "use strict";
 
-var BWGFX = (function (my) {
+window.BWGFX = (function (my) {
   //
   // Init
   //
-  var f = {}; // main object
-  var debug = true;
-  var size;
+  const debug = true,
+  // Default palette
+  // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Game-Palette
+  defaultCols = [ // Hex RGBA
+    [0x00, 0x00, 0x00, 0xFF], // 00: $0000 (Black)
+    [0x40, 0x40, 0x40, 0xFF], // 01: $0444 (Dark Grey)
+    [0x60, 0x60, 0x60, 0xFF], // 02: $0666 (Grey)
+    [0x80, 0x80, 0x80, 0xFF], // 03: $0888 (Light Grey)
+    [0xA0, 0xA0, 0xA0, 0xFF], // 04: $0AAA (Bright Grey)
+    [0x20, 0x90, 0x20, 0xFF], // 05: $0292 (Green)
+    [0x10, 0xC0, 0x10, 0xFF], // 06: $01C1 (Light Green)
+    [0x00, 0x00, 0xE0, 0xFF], // 07: $000E (Dark Blue)
+    [0x40, 0x80, 0xE0, 0xFF], // 08: $048E (Light Blue)
+    [0x80, 0x20, 0x10, 0xFF], // 09: $0821 (Brown)
+    [0xB0, 0x30, 0x10, 0xFF], // 10: $0B31 (Brownish Red)
+    [0xE0, 0x90, 0x60, 0xFF], // 11: $0E96 (Orange)
+    [0xD0, 0x00, 0x00, 0xFF], // 12: $0D00 (Red)
+    [0xF0, 0xD0, 0x00, 0xFF], // 13: $0FD0 (Yellow)
+    [0xE0, 0xE0, 0xE0, 0xFF], // 14: $0EEE (White)
+    [0x00, 0x00, 0x00, 0x00], // 15: transparent [0xC0, 0x00, 0x80, 0xFF], // $0C08
+  ],
+  // sets
+  // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Colouring-Large-Monsters
+  sets = [
+    [ 3, 4,14], // 00: Grey
+    [ 8, 4,14], // 01: Light Blue
+    [ 5, 6,14], // 02: Light Green
+    [ 9,10,11], // 03: Brownish Red
+    [ 9,12,11], // 04: Red
+    [10,11,13], // 05: Light Orange
+    [11,13,14], // 06: Yellowy White
+    [12,11,13], // 07: Golden Orange
+    [ 2, 3, 4], // 08: Darker grey
+    [ 8, 4,13], // 09: Light blue /yellow
+    [ 5, 6,13], // 0A: Green/Yellow
+    [ 7, 8, 4],//[ 7, 8, 4], // 0B: Darker blue/grey
+    [ 7, 8,13], // 0C: Blue/Yellow ?? 
+  ];
+  let f = {}, // main object
+  size;
 
   //
   // Private
   //
   function log(out) {
     if (debug) console.log("BWGFX:", out);
-    var dbg_DOM = document.getElementById("info");
+    const dbg_DOM = document.getElementById("info");
     if (dbg_DOM) dbg_DOM.innerHTML += out +"<br/>";
   }
   function xhr(url, cb) {
     log("xhr: "+ url);
-    var x = new XMLHttpRequest();
+    const x = new XMLHttpRequest();
     x.open("GET", url, true);
     x.responseType = "arraybuffer";
     x.onload = function() {
       log("File loaded");
-      var ret = (x.status == 200) ? x.response : [];
+      const ret = (x.status == 200) ? x.response : [];
       if (cb) cb(ret);
     }
     x.send();
@@ -37,21 +74,17 @@ var BWGFX = (function (my) {
     xhr(url, function(buf){
       /*
       xhr(url.replace('/bw-gfx/','/bw-data/').toLowerCase()+'.colours', function(colours){
-        xhr(url.replace('/bw-gfx/','/bw-data/').toLowerCase()+'.gradeoffset', function(gradeoffset){
-          parse(buf, colours, gradeoffset, canv);
-        });
+        parse(buf, colours, canv);
       });
       */
-      parse(buf, null, null, canv);
+      parse(buf, null, canv);
     });
   }
-  function parse(buf, col, grade, canv) {
+  function parse(buf, col, canv) {
     f = {}
-    f.data = new Uint8Array(buf); // 5096 bytes
+    f.data = new Uint8Array(buf);
     f.idx = 0;
-    //f.i8 = new Int8Array(buf);
-    f.col = new Uint8Array(col); // [9, 11, 10, 8, 3, 4, 5, 7]
-    f.grade = new Uint8Array(grade); // 6
+    f.col = new Uint8Array(col); // Behemoth [9, 11, 10, 8, 3, 4, 5, 7] or Dragon [11, 10, 4, 8, 7, 9, 5, 6]
     f.canv = canv;//document.createElement('canvas');
     f.ctx = f.canv.getContext('2d');
 
@@ -59,23 +92,24 @@ var BWGFX = (function (my) {
   }
   function render() {
     if (!f.canv) return // early exit
-    var renderWidth = range_width.value;
+    const renderWidth = range_width.value;
     if (renderWidth > f.data.length) return // early exit
     f.canv.width = renderWidth; // steps = 4
     f.canv.height = f.data.length / f.canv.width; // todo: round up to 4 ???
-    var imgData = f.ctx.createImageData(f.canv.width,f.canv.height)
+    const imgData = f.ctx.createImageData(f.canv.width,f.canv.height)
 
-    // colors
-    // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Game-Palette
-    //var cols = ['000','444','666','888','AAA','292','1C1','00E','48E','821','B31','E96','D00','FD0','EEE','C08']
-    // Default palete in RGBA 32bit
-    var cols = ['000000FF','404040FF','606060FF','808080FF','A0A0A0FF','209020FF','10C010FF','0000E0FF','4080E0FF','802010FF','B03010FF','E09060FF','D00000FF','F0D000FF','E0E0E0FF','C00080FF']
-    cols[15] = '00000000'; // transparent
+    f.canv.style.backgroundColor = col_bg.value;
     
     // overwrite colors with loaded ones (colorNums: 4, 8, 12)
+    let cols = [...defaultCols]
+    // no, i will make dropdown for that
+    // just pick selected colset
+    let activeColSet = sets[ colsetselect.selectedIndex ];
+    //console.log(f.col, colsetselect.selectedIndex, activeColSet)
     
-    // grade
-    // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Colouring-Large-Monsters
+    cols[4] = defaultCols[ activeColSet[0] ];
+    cols[8] = defaultCols[ activeColSet[1] ];
+    cols[12] = defaultCols[ activeColSet[2] ];
     
     // data
     // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Atari-ST-Raw-Data-Format
@@ -85,46 +119,42 @@ var BWGFX = (function (my) {
     f.pixelblocksTotal = f.data.length/8;
     //log(f.pixelblocksTotal);
     
-    var dataIndex = 0;
-    for (var i = 0; i < f.pixelblocksTotal; i++) {
-      var p = readPixelBlock(f);
+    for (let i = 0, dataIndex = 0, n = f.pixelblocksTotal; i < n; i++) {
+      const p = readPixelBlock(f);
     
-      for (var y = 0; y < 4; y++) {
-        for (var x = 0; x < 4; x++) {
-          var pixelColorNum = get_atari_pixelcolor(p,y*4+x);
-          var pixelCol = cols[pixelColorNum];
+      for (let y = 0; y < 4; y++) {
+        for (let x = 0; x < 4; x++) {
+          const pixelColorNum = get_atari_pixelcolor(p,y*4+x);
+          const pixelCol = cols[pixelColorNum];
           //console.log('pixelBlock '+i, y*4+x, pixelColorNum, cols[pixelColorNum]);
-          imgData.data[dataIndex] = parseInt(pixelCol.substr(0,2), 16);    // R // not performant, i know!
-          imgData.data[dataIndex + 1] = parseInt(pixelCol.substr(2,2), 16);// G
-          imgData.data[dataIndex + 2] = parseInt(pixelCol.substr(4,2), 16);// B
-          imgData.data[dataIndex + 3] = parseInt(pixelCol.substr(6,2), 16);// A
+          imgData.data[dataIndex]     = pixelCol[0];// R
+          imgData.data[dataIndex + 1] = pixelCol[1];// G
+          imgData.data[dataIndex + 2] = pixelCol[2];// B
+          imgData.data[dataIndex + 3] = pixelCol[3];// A
           dataIndex += 4;
         }
       }
       
     }
     f.idx = 0;
-    //f.ctx.fillStyle = col_bg.value;
-    //f.ctx.fillRect(0, 0, f.canv.width, f.canv.height);
-    f.canv.style.backgroundColor = col_bg.value;
     f.ctx.putImageData(imgData, 0, 0);
 
     if (dbg_DIM) dbg_DIM.innerText = imgData.width +'x'+ imgData.height;
   }
   function save() {
-    var name = dataselect.value
+    let name = dataselect.value
     if (name.indexOf('bw-sfx') > 0) return // early exit
     name = name+'_'+f.canv.width+'.png';
     
-    var a = document.createElement("a");
-    var d = new Date();
+    const a = document.createElement('a');
+    let d = new Date();
     d = d.toISOString();
     // PNG
     a.setAttribute('download', name);
-    var dataURL = f.canv.toDataURL('image/png');
-    var url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+    const dataURL = f.canv.toDataURL('image/png');
+    const url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
     f.canv.toBlob(function(blob) {
-      var url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       a.setAttribute('href', url);
       a.click();
       log('Screenshot saved as: '+ name);
@@ -134,6 +164,7 @@ var BWGFX = (function (my) {
     return [f.data[f.idx++], f.data[f.idx++], f.data[f.idx++], f.data[f.idx++], f.data[f.idx++], f.data[f.idx++], f.data[f.idx++], f.data[f.idx++] ];
   }
   // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Atari-ST-Raw-Data-Format
+  // Original source by: bit
   // p = one pixelblock of 16 pixels = 4width x 4height x 4planes = 64 bits = 8 bytes
   // n = selected pixelnumber
   function get_atari_pixelcolor(p, n) {
@@ -169,4 +200,4 @@ var BWGFX = (function (my) {
   // Exit
   //
   return my;
-}(BWGFX || {}));
+}({}));

@@ -32,23 +32,11 @@ button:focus {
 }
 
 #GFXcanvas {
-  position: absolute;
   pointer-events: none;
-  left: 0;
-  top: 5vh;
-  background-color: black;
+  background-color: transparent;
   image-rendering: pixelated;
+  transform: translate(50%, 50%);
 }
-#GFXcanvas.scale {
-  height: 75vw;
-  width: 75vw;
-}
-  @media (min-width:calc(4/3*90vh)) {
-    #GFXcanvas.scale {
-      height: 90vh;
-      width: calc(4/3*90vh);
-    }
-  }
 #info {
   position: absolute;
   top: 5vh;
