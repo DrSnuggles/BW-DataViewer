@@ -43,7 +43,7 @@ window.BWGFX = (function (my) {
     [ 2, 3, 4], // 08: Darker grey
     [ 8, 4,13], // 09: Light blue /yellow
     [ 5, 6,13], // 0A: Green/Yellow
-    [ 7, 8, 4],//[ 7, 8, 4], // 0B: Darker blue/grey
+    [ 7, 8, 4], // 0B: Darker blue/grey
     [ 7, 8,13], // 0C: Blue/Yellow ??
     [ 4, 8,12], // 0D: RAW
   ];
@@ -105,7 +105,7 @@ window.BWGFX = (function (my) {
     let cols = [...defaultCols]
     // no, i will make dropdown for that
     // just pick selected colset
-    let activeColSet = sets[ colsetselect.selectedIndex ];
+    let activeColSet = sets[ colsetselect.value ];
     //console.log(f.col, colsetselect.selectedIndex, activeColSet)
     
     cols[4] = defaultCols[ activeColSet[0] ];

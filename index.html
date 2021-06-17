@@ -26,20 +26,20 @@
     html.push('</optgroup>');
     html.push('</select>');
     html.push('<select id="colsetselect" onchange="BWGFX.render()" title="Colour sets">');
-      html.push('<option>0: Grey</option>');
-      html.push('<option>1: Light Blue</option>');
-      html.push('<option>2: Light Green</option>');
-      html.push('<option>3: Brownish Red</option>');
-      html.push('<option>4: Red</option>');
-      html.push('<option>5: Light Orange</option>');
-      html.push('<option>6: Yellowy White</option>');
-      html.push('<option>7: Golden Orange</option>');
-      html.push('<option>8: Darker Grey</option>');
-      html.push('<option>9: Light Blue/Yellow</option>');
-      html.push('<option>A: Green/Yellow</option>');
-      html.push('<option>B: Darker Blue/Grey</option>');
-      html.push('<option>C: Blue/Yellow</option>');
-      html.push('<option>D: RAW</option>');
+      html.push('<option value="13">RAW</option>');
+      html.push('<option value="0">0: Grey</option>');
+      html.push('<option value="1">1: Light Blue</option>');
+      html.push('<option value="2">2: Light Green</option>');
+      html.push('<option value="3">3: Brownish Red</option>');
+      html.push('<option value="4">4: Red</option>');
+      html.push('<option value="5">5: Light Orange</option>');
+      html.push('<option value="6">6: Yellowy White</option>');
+      html.push('<option value="7">7: Golden Orange</option>');
+      html.push('<option value="8">8: Darker Grey</option>');
+      html.push('<option value="9">9: Light Blue/Yellow</option>');
+      html.push('<option value="10">A: Green/Yellow</option>');
+      html.push('<option value="11">B: Darker Blue/Grey</option>');
+      html.push('<option value="12">C: Blue/Yellow</option>');
     html.push('</select>');
     html.push('AntiAlias<input type="checkbox" id="cb_alias" onchange="GFXcanvas.classList.toggle(\'aa\')" title="AntiAlias">');
     html.push('&nbsp;<span id="dbg_DIM">32x32</span>');
@@ -51,7 +51,7 @@
     html.push('<br/><canvas id="GFXcanvas" width="32" height="32"></canvas>');
     document.body.innerHTML = html.join('');
     dataselect.selectedIndex = 10; // Behemoth = 4
-    colsetselect.selectedIndex = 11;
+    colsetselect.selectedIndex = 12;
     Load(dataselect.value);
     
     //
