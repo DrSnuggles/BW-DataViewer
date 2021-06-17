@@ -44,7 +44,8 @@ window.BWGFX = (function (my) {
     [ 8, 4,13], // 09: Light blue /yellow
     [ 5, 6,13], // 0A: Green/Yellow
     [ 7, 8, 4],//[ 7, 8, 4], // 0B: Darker blue/grey
-    [ 7, 8,13], // 0C: Blue/Yellow ?? 
+    [ 7, 8,13], // 0C: Blue/Yellow ??
+    [ 4, 8,12], // 0D: RAW
   ];
   let f = {}, // main object
   size;
