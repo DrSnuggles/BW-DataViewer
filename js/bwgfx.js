@@ -96,14 +96,32 @@ window.BWGFX = (function (my) {
     const renderWidth = range_width.value;
     if (renderWidth > f.data.length) return // early exit
     f.canv.width = renderWidth; // steps = 4
-    f.canv.height = f.data.length / f.canv.width; // todo: round up to 4 ???
+    f.canv.height = f.data.length / f.canv.width;
+    if (renderWidth == 8) f.canv.height *= 8
     const imgData = f.ctx.createImageData(f.canv.width,f.canv.height)
 
     f.canv.style.backgroundColor = col_bg.value;
     
-    // overwrite colors with loaded ones (colorNums: 4, 8, 12)
     let cols = [...defaultCols]
-    // no, i will make dropdown for that
+    
+    // MrFlay: The font consists of single bits, always in packets of eight (two colors).
+    if (renderWidth == 8) {
+
+      for (let i = 0, dataIndex = 0, n = f.data.length; i < n; i++) {
+        for (let b = 7; b >= 0; b--) {
+          let bit = (f.data[i] >> b) & 1
+          const pixelCol = bit ? cols[14] : cols[15]; // White / transparent
+          imgData.data[dataIndex]     = pixelCol[0];// R
+          imgData.data[dataIndex + 1] = pixelCol[1];// G
+          imgData.data[dataIndex + 2] = pixelCol[2];// B
+          imgData.data[dataIndex + 3] = pixelCol[3];// A
+          dataIndex += 4;
+        }
+      }
+
+    } // renderWith=8
+
+    // overwrite colors with loaded ones (colorNums: 4, 8, 12)
     // just pick selected colset
     let activeColSet = sets[ colsetselect.value ];
     //console.log(f.col, colsetselect.selectedIndex, activeColSet)
@@ -112,31 +130,35 @@ window.BWGFX = (function (my) {
     cols[8] = defaultCols[ activeColSet[1] ];
     cols[12] = defaultCols[ activeColSet[2] ];
     
-    // data
-    // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Atari-ST-Raw-Data-Format
-    // Atari 320x200, 16 color, you always have one quadword for one pixelblock of 16 pixels
-    // Each word describes one plane and got 16 bits for the 16 pixels
-    // 16 colors = 4 planes = quadword, word = 2bytes -> 4width x 4height x 4planes = 64 bits = 8 bytes OK
-    f.pixelblocksTotal = f.data.length/8;
-    //log(f.pixelblocksTotal);
-    
-    for (let i = 0, dataIndex = 0, n = f.pixelblocksTotal; i < n; i++) {
-      const p = readPixelBlock(f);
-    
-      for (let y = 0; y < 4; y++) {
-        for (let x = 0; x < 4; x++) {
-          const pixelColorNum = get_atari_pixelcolor(p,y*4+x);
-          const pixelCol = cols[pixelColorNum];
-          //console.log('pixelBlock '+i, y*4+x, pixelColorNum, cols[pixelColorNum]);
-          imgData.data[dataIndex]     = pixelCol[0];// R
-          imgData.data[dataIndex + 1] = pixelCol[1];// G
-          imgData.data[dataIndex + 2] = pixelCol[2];// B
-          imgData.data[dataIndex + 3] = pixelCol[3];// A
-          dataIndex += 4;
+    if (renderWidth > 8) {
+      // default data
+      // https://github.com/HoraceAndTheSpider/Bloodwych-68k/wiki/Atari-ST-Raw-Data-Format
+      // Atari 320x200, 16 color, you always have one quadword for one pixelblock of 16 pixels
+      // Each word describes one plane and got 16 bits for the 16 pixels
+      // 16 colors = 4 planes = quadword, word = 2bytes -> 4width x 4height x 4planes = 64 bits = 8 bytes OK
+      f.pixelblocksTotal = f.data.length/8;
+      //log(f.pixelblocksTotal);
+      
+      for (let i = 0, dataIndex = 0, n = f.pixelblocksTotal; i < n; i++) {
+        const p = readPixelBlock(f);
+        
+        for (let y = 0; y < 4; y++) {
+          for (let x = 0; x < 4; x++) {
+            const pixelColorNum = get_atari_pixelcolor(p,y*4+x);
+            const pixelCol = cols[pixelColorNum];
+            //console.log('pixelBlock '+i, y*4+x, pixelColorNum, cols[pixelColorNum]);
+            imgData.data[dataIndex]     = pixelCol[0];// R
+            imgData.data[dataIndex + 1] = pixelCol[1];// G
+            imgData.data[dataIndex + 2] = pixelCol[2];// B
+            imgData.data[dataIndex + 3] = pixelCol[3];// A
+            dataIndex += 4;
+          }
         }
+        
       }
       
     }
+    
     f.idx = 0;
     f.ctx.putImageData(imgData, 0, 0);
 
