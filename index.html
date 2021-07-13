@@ -45,7 +45,7 @@
     html.push('&nbsp;<span id="dbg_DIM">32x32</span>');
     html.push('<input type="color" title="Background color" id="col_bg" oninput="BWGFX.render()" value="#C00080"/>');
     html.push('<button onclick="BWGFX.save()" title="Save">Save</button>');
-    html.push('<br/><input type="range" id="range_width" value="32" min="8" max="128" step="8" oninput="BWGFX.render()" title="Width in pixel" style="width:50%;"/>');
+    html.push('<br/><input type="range" id="range_width" value="32" min="8" max="320" step="8" oninput="BWGFX.render()" title="Width in pixel" style="width:50%;"/>');
     html.push('<br/><input type="range" value="1" min="0.1" max="4" step="0.01" ondblclick="this.value=GFXcanvas.style.scale=1" oninput="GFXcanvas.style.scale = this.value" title="Scale" style="width:50%;"/>');
     html.push('<div id="info"><br/></div>');
     html.push('<br/><canvas id="GFXcanvas" width="32" height="32"></canvas>');
